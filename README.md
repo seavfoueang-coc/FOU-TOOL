@@ -3,28 +3,45 @@
 <div align="center">
 
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11%20(x64)-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Release](https://img.shields.io/badge/Release-v1.0.0-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-100%25%20Free%20%7C%20No%20Ads-d4f938?style=for-the-badge&labelColor=black)
+![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)
 ![Developer](https://img.shields.io/badge/Developer-Seavfou%20Eang-blueviolet?style=for-the-badge&logo=github)
+
+<br/>
+
+[![Download for Windows](https://img.shields.io/badge/⬇️_Direct_Download-HONGGUO.DL--1.0.0--Setup.exe-success?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/seavfoueang-coc/HONGGUA-DL/releases/download/v1.0.0/HONGGUO.DL-1.0.0-Setup.exe)
 
 <p align="center">
   <b>High-Performance Windows Desktop Application for Parsing, Batch Downloading, Decrypting, and Archiving ByteDance Hongguo (红果短剧) Short Dramas.</b>
 </p>
 
 <p align="center">
+  <a href="#download">Download</a> •
+  <a href="#overview">Overview</a> •
   <a href="#features">Features</a> •
   <a href="#architecture">Architecture</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#how-to-use">How to Use</a> •
+  <a href="#hosting-on-vercel">Vercel Hosting</a> •
   <a href="#about-the-developer">About Developer</a> •
-  <a href="#support--donations">Support (KHQR)</a>
+  <a href="#support--donations-khqr">Support (KHQR)</a>
 </p>
 
 ---
 
 </div>
 
-## 📖 Overview
+## Download
+
+Get the official Windows executable installer:
+
+- **Direct Download**: [**HONGGUO.DL-1.0.0-Setup.exe**](https://github.com/seavfoueang-coc/HONGGUA-DL/releases/download/v1.0.0/HONGGUO.DL-1.0.0-Setup.exe)
+- **Target OS**: Windows 10 / Windows 11 (64-bit)
+- **Release Version**: `v1.0.0`
+- **License**: 100% Free · No Ads · Standalone
+
+---
+
+## Overview
 
 **HONGGUO DL** is an open, high-speed, and clean desktop tool built specifically for archiving ByteDance's **Hongguo Free Short Drama (红果免费短剧)** series on Windows.
 
@@ -35,18 +52,18 @@ Unlike web-based downloaders that force users through spammy link shorteners, ad
 
 ---
 
-## ✨ Features
+## Features
 
-- ⚡ **Instant Catalog Parsing**: Paste any Hongguo series share URL or web link (`hongguoduanju.com`) to instantly resolve the complete episode index (1–100+ episodes) with titles, cover posters, and video metadata.
-- 🚀 **Parallel Turbo Downloader**: Multi-stream concurrent segment fetcher with automatic chunk retry, failure recovery, and connection pooling.
-- 🔓 **On-Device Stream Decryption**: Automatic extraction of video segments, decrypting cipher payloads, and remuxing into standard MP4 files compatible with any media player (VLC, Windows Media Player, PotPlayer).
-- 🏷️ **Smart Episode Renaming**: Files are automatically organized and named neatly: `[Series Name] - Episode 001.mp4`, `[Series Name] - Episode 002.mp4`, etc.
-- 🌐 **Bilingual Support**: Fully localized in **English** and **Khmer (ភាសាខ្មែរ)**.
-- 📦 **Standalone Portable Executable**: Runs as a single portable `.exe` on Windows 10/11 x64 without requiring complex external dependencies.
+- **Instant Catalog Parsing**: Paste any Hongguo series share URL or web link (`hongguoduanju.com`) to instantly resolve the complete episode index (1–100+ episodes) with titles, cover posters, and video metadata.
+- **Parallel Turbo Downloader**: Multi-stream concurrent segment fetcher with automatic chunk retry, failure recovery, and connection pooling.
+- **On-Device Stream Decryption**: Automatic extraction of video segments, decrypting cipher payloads, and remuxing into standard MP4 files compatible with any media player (VLC, Windows Media Player, PotPlayer).
+- **Smart Episode Renaming**: Files are automatically organized and named neatly: `[Series Name] - Episode 001.mp4`, `[Series Name] - Episode 002.mp4`, etc.
+- **Bilingual Support**: Fully localized in **English** and **Khmer (ភាសាខ្មែរ)**.
+- **Standalone Installer**: One-click install and run on Windows 10/11 x64.
 
 ---
 
-## 🏗️ Technical Pipeline & Architecture
+## Architecture & Pipeline
 
 The application pipeline is structured into five isolated, robust modules:
 
@@ -71,43 +88,23 @@ The application pipeline is structured into five isolated, robust modules:
 
 ---
 
-## 🚀 Quick Start (Web App & Showcase)
+## Hosting on Vercel
 
-This repository includes both the technical architecture showcase web application and build instructions for the desktop client.
+This repository is pre-configured with `vercel.json` for one-click deployment on **Vercel**:
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18.0.0 or higher)
-- `npm` or `bun`
-
-### Running Locally
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/seavfoueang-coc/hongguo-dl.git
-   cd hongguo-dl
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the local development server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-4. **Build for production**:
-   ```bash
-   npm run build
-   ```
+1. Push this repository to your GitHub account: `https://github.com/seavfoueang-coc/HONGGUA-DL`.
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New Project"**.
+3. Import your GitHub repository.
+4. Vercel automatically detects the Vite framework and runs:
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+5. Click **Deploy**. Your site will be live instantly with global CDN and automated SPA routing rewrites!
 
 ---
 
-## 💻 Desktop Application Usage
+## Desktop Application Usage
 
-1. Launch `hongguo-dl-portable.exe` on Windows 10 or 11.
+1. Download and run [**HONGGUO.DL-1.0.0-Setup.exe**](https://github.com/seavfoueang-coc/HONGGUA-DL/releases/download/v1.0.0/HONGGUO.DL-1.0.0-Setup.exe).
 2. Open the **Hongguo Short Drama (红果短剧)** app or web player and copy the share link of your desired drama.
 3. Paste the URL into HONGGUO DL and click **Parse Series (វិភាគតំណ)**.
 4. Select the episodes you wish to save (or click **Select All**).
@@ -116,9 +113,9 @@ This repository includes both the technical architecture showcase web applicatio
 
 ---
 
-## 👨‍💻 About the Developer
+## About the Developer
 
-**Seavfou Eang (សៀវហ្វូ អៀង)**
+**Seavfou Eang**
 - **GitHub**: [@seavfoueang-coc](https://github.com/seavfoueang-coc)
 - **Telegram**: [@eangseavfou](https://t.me/eangseavfou)
 - **Role**: Software Developer & Creator of HONGGUO DL
@@ -127,7 +124,7 @@ This repository includes both the technical architecture showcase web applicatio
 
 ---
 
-## 💖 Support & Donations (KHQR)
+## Support & Donations (KHQR)
 
 HONGGUO DL is completely **free to use** and contains **no advertisements**. If this project saved you time or helped you archive your favorite dramas, consider supporting continued maintenance and development with a coffee via Cambodian **KHQR / Bakong**:
 
@@ -139,16 +136,18 @@ HONGGUO DL is completely **free to use** and contains **no advertisements**. If 
 | **Supported Banking Apps**: ABA Mobile, Bakong, Wing, ACLEDA, Canadia, Sathapana, Alipay+, UnionPay |
 | *(Scan using any local Cambodian mobile banking application)* |
 
+*Place your official QR image at `public/khqr.png` to display it automatically in the web app.*
+
 </div>
 
 ---
 
-## ⚖️ Legal Disclaimer
+## Legal Disclaimer
 
 This software is developed strictly for personal educational, research, and archiving purposes. All short drama media, trademarks, and logos belong to their respective copyright holders (ByteDance / Hongguo). Users are responsible for complying with the local laws and terms of service of the content provider.
 
 ---
 
 <div align="center">
-  <sub>Created with ❤️ by <a href="https://github.com/seavfoueang-coc">Seavfou Eang</a>.</sub>
+  <sub>Crafted by <a href="https://github.com/seavfoueang-coc">Seavfou Eang</a>.</sub>
 </div>

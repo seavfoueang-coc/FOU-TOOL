@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Copy, Check, QrCode } from 'lucide-react';
-import QRCode from 'qrcode';
+import React, { useState, useEffect, useRef } from 'react';
+import { Copy, Check, Upload, Image as ImageIcon, QrCode } from 'lucide-react';
 import { Language } from '../i18n/translations';
 
 interface KhqrCardProps {
@@ -10,24 +9,49 @@ interface KhqrCardProps {
 
 export const KhqrCard: React.FC<KhqrCardProps> = ({ darkMode, lang }) => {
   const [copied, setCopied] = useState(false);
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const isKm = lang === 'km';
 
-  // Generate authentic scannable KHQR code for SEAVFOU EANG
+  // Candidate paths where the user can place their KHQR image
+  const candidatePaths = ['/khqr.png', '/khqr.jpg', '/khqr.jpeg', '/images/khqr.png', '/images/khqr.jpg'];
+
   useEffect(() => {
-    // Official Cambodian Bakong KHQR EMVCo payload format for SEAVFOU EANG
-    const khqrPayload = "00020101021129370016bakong@nbc.gov.kh0109SEAVFOU EANG5204599953038405802KH5912SEAVFOU EANG6010Phnom Penh63045E1B";
-    QRCode.toDataURL(khqrPayload, {
-      width: 480,
-      margin: 1,
-      color: {
-        dark: '#000000',
-        light: '#ffffff',
-      },
-      errorCorrectionLevel: 'M',
-    }).then(url => {
-      setQrDataUrl(url);
-    }).catch(() => {});
+    // 1. Check if user already uploaded in browser
+    const stored = localStorage.getItem('hongguo_khqr_user_img');
+    if (stored) {
+      setImageSrc(stored);
+      return;
+    }
+
+    // 2. Try loading candidate image paths from /public folder
+    let active = true;
+    const testImage = (index: number) => {
+      if (index >= candidatePaths.length) {
+        if (active) setImageError(true);
+        return;
+      }
+
+      const img = new Image();
+      img.src = candidatePaths[index];
+      img.onload = () => {
+        if (active) {
+          setImageSrc(candidatePaths[index]);
+          setImageError(false);
+        }
+      };
+      img.onerror = () => {
+        testImage(index + 1);
+      };
+    };
+
+    testImage(0);
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleCopyName = () => {
@@ -36,90 +60,97 @@ export const KhqrCard: React.FC<KhqrCardProps> = ({ darkMode, lang }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
+        setImageSrc(result);
+        setImageError(false);
+        localStorage.setItem('hongguo_khqr_user_img', result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center">
-      {/* Authentic KHQR Stand Card - Crisp, Sized to Scan Easily */}
-      <div className="w-full max-w-[290px] rounded-2xl overflow-hidden bg-white text-slate-900 shadow-2xl border-2 border-slate-200 select-none transition-transform hover:scale-[1.01]">
-        {/* Top Header Banner: Official Red with KHQR Logo */}
-        <div className="bg-[#e1251b] py-2.5 px-4 text-white flex items-center justify-center relative shadow-sm">
-          <div className="flex items-center gap-1 font-extrabold tracking-wider text-lg">
-            <span>KH</span>
-            <span className="inline-block border-2 border-white rounded-full w-4 h-4 text-center text-[9px] leading-[13px]">Q</span>
-            <span>R</span>
+      {/* Hidden file input */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} 
+        accept="image/*" 
+        className="hidden" 
+      />
+
+      {imageSrc && !imageError ? (
+        /* Real KHQR Image Display (High-Res, Cleanly Framed) */
+        <div 
+          onClick={() => fileInputRef.current?.click()}
+          className="relative w-full max-w-[280px] rounded-2xl overflow-hidden bg-white shadow-2xl border-2 border-slate-200 cursor-pointer group transition-transform hover:scale-[1.01]"
+          title="Click to replace with another image"
+        >
+          <img 
+            src={imageSrc} 
+            alt="SEAVFOU EANG KHQR" 
+            className="w-full h-auto object-contain block"
+            onError={() => setImageError(true)}
+          />
+
+          {/* Hover overlay allowing user to click and update if they wish */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-xs font-semibold gap-1.5 transition-opacity">
+            <Upload className="w-5 h-5 text-[#c6f135]" />
+            <span>{isKm ? 'ចុចដើម្បីប្តូររូបភាព' : 'Click to change image'}</span>
           </div>
         </div>
+      ) : (
+        /* Placeholder / Drop Zone when image is not yet in public folder */
+        <div 
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`w-full max-w-[280px] aspect-[3/4] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all ${
+            isDragging 
+              ? 'border-[#c6f135] bg-[#c6f135]/10' 
+              : 'border-[#273549] bg-[#141b26] hover:border-[#c6f135]/60 hover:bg-[#182232]'
+          }`}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-[#1c2738] flex items-center justify-center mb-3 text-[#c6f135]">
+            <QrCode className="w-7 h-7" />
+          </div>
 
-        {/* Account Name Header */}
-        <div className="pt-3 pb-2 px-4 text-center border-b border-dashed border-slate-200">
-          <div className="text-[10px] font-mono tracking-wider uppercase text-slate-400 font-bold">
-            {isKm ? 'ឈ្មោះគណនី' : 'ACCOUNT NAME'}
-          </div>
-          <div className="text-base font-extrabold tracking-wide text-slate-900 font-mono">
-            SEAVFOU EANG
-          </div>
+          <h5 className="text-sm font-bold text-white mb-1">
+            {isKm ? 'ដាក់រូបភាព KHQR របស់អ្នក' : 'Add Your Real KHQR Image'}
+          </h5>
+
+          <p className="text-[11px] text-slate-400 leading-relaxed mb-3">
+            {isKm 
+              ? 'ទម្លាក់រូបភាពនៅទីនេះ ឬដាក់ឯកសារក្នុង' 
+              : 'Drop your image here or put in'}{' '}
+            <code className="text-[#c6f135] font-mono text-[10px] block mt-1 bg-black/30 px-2 py-0.5 rounded">
+              public/khqr.png
+            </code>
+          </p>
+
+          <span className="px-3 py-1.5 rounded-lg bg-[#c6f135] text-black text-xs font-bold shadow flex items-center gap-1.5">
+            <Upload className="w-3.5 h-3.5" />
+            <span>{isKm ? 'ជ្រើសរើសរូបភាព' : 'Browse File'}</span>
+          </span>
         </div>
+      )}
 
-        {/* Center: REAL, Large, Clear Scannable QR Code */}
-        <div className="p-4 flex flex-col items-center justify-center bg-white relative">
-          <div className="relative w-52 h-52 sm:w-56 sm:h-56 p-1.5 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
-            {qrDataUrl ? (
-              <img 
-                src={qrDataUrl} 
-                alt="SEAVFOU EANG KHQR" 
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <div className="w-full h-full bg-slate-100 animate-pulse rounded-lg"></div>
-            )}
-
-            {/* Central Official Bakong Red Circle Flower Emblem */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#e1251b] border-2 border-white shadow-md flex items-center justify-center pointer-events-none">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" fill="currentColor" />
-                <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.2 2.2m9.8 9.8l2.2 2.2M4.9 19.1l2.2-2.2m9.8-9.8l2.2-2.2" strokeLinecap="round" />
-              </svg>
-            </div>
-          </div>
-
-          <div className="mt-2 text-[10px] font-mono text-slate-500 font-semibold tracking-wider uppercase">
-            BAKONG · KHQR
-          </div>
-        </div>
-
-        {/* Footer: Member of KHQR & Supported Payment Networks */}
-        <div className="bg-slate-50 px-4 py-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-600">
-          <div>
-            <div className="text-[8px] uppercase tracking-wider text-slate-400">
-              {isKm ? 'សមាជិក' : 'Member of'}
-            </div>
-            <div className="font-extrabold text-[#e1251b] tracking-wider text-xs">
-              KHQR
-            </div>
-          </div>
-
-          <div className="text-right">
-            <div className="text-[8px] uppercase tracking-wider text-slate-400 mb-0.5">
-              {isKm ? 'ទទួលស្គាល់' : 'Accepted here'}
-            </div>
-            <div className="flex items-center gap-1.5 justify-end">
-              <span className="px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold text-[8px]">
-                UnionPay
-              </span>
-              <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-bold text-[8px]">
-                云闪付
-              </span>
-              <span className="px-1.5 py-0.5 rounded bg-[#1677ff] text-white font-bold text-[8px]">
-                Alipay+
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Red Decorative Line */}
-        <div className="h-1 bg-[#e1251b] w-full"></div>
-      </div>
-
-      {/* 1-Click Copy Name & Instructions */}
+      {/* Copy Account Name Button */}
       <div className="mt-3.5 flex flex-col items-center gap-1.5">
         <button
           onClick={handleCopyName}
