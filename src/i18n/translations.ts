@@ -53,6 +53,7 @@ export const TRANSLATIONS = {
     bypassNoticeDesc: 'I vibe coded this entire project. Please note: The internal stream bypass and DRM decryption source code is kept strictly private and will not be made public to avoid API patch invalidation and protect long-term stability. The desktop app is released as a clean, ready-to-run Windows .exe installer.',
     githubBtn: 'GitHub Profile',
     telegramBtn: 'Telegram: @eangseavfou',
+    openKhqrFullScreen: 'Open KHQR Full Screen',
 
     // App UI labels
     workspace: 'WORKSPACE',
@@ -200,6 +201,7 @@ export const TRANSLATIONS = {
     bypassNoticeDesc: 'ខ្ញុំបាន vibe code គម្រោងនេះឡើងដោយផ្ទាល់។ ចំណាំ៖ Source code នៃផ្នែក bypass និង decryption មិនត្រូវបានដាក់ជាសាធារណៈឡើយ (រក្សាទុកជាឯកជនដើម្បីការពារកុំឱ្យបែកធ្លាយ និងខូចប្រព័ន្ធ)។ កម្មវិធីសម្រាប់ Windows ត្រូវបានផ្ដល់ជូនជាឯកសារដំឡើង (.exe) ស្រាប់។',
     githubBtn: 'គណនី GitHub',
     telegramBtn: 'Telegram: @eangseavfou',
+    openKhqrFullScreen: 'ពង្រីក KHQR ពេញអេក្រង់',
 
     // App UI labels
     workspace: 'លំហការងារ',
