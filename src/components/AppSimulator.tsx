@@ -265,23 +265,23 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
           internalDarkMode ? 'bg-[#0a0d14] border-[#18202d]' : 'bg-slate-50 border-slate-200'
         }`}>
           {/* Logo Lockup matching screenshot */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="shrink-0 flex items-center">
               <HongguoLogo size={36} />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-sm sm:text-base font-extrabold tracking-tight flex items-center gap-1 leading-none">
                 <span className="text-white">HONGGUO</span>
                 <span className="text-[#c6f135]">DL</span>
               </div>
-              <div className="text-[9px] font-medium tracking-widest uppercase text-slate-500 font-mono mt-0.5">
+              <div className="text-[9px] font-medium tracking-widest uppercase text-slate-500 font-mono mt-0.5 truncate">
                 {t.brandSubtitle}
               </div>
             </div>
           </div>
 
           {/* Top Right Controls: Status pill + Theme toggle */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 shrink-0">
             <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
               internalDarkMode ? 'bg-[#141b26] border-[#222d3d] text-slate-300' : 'bg-white border-slate-200 text-slate-700'
             }`}>
@@ -311,7 +311,7 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                   {t.workspace}
                 </div>
 
-                <div className="flex md:flex-col gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                <div className="flex flex-wrap md:flex-col md:flex-nowrap gap-1.5">
                   {/* Discover Button - Signature Lime Active Pill */}
                   <button
                     onClick={() => setActiveTab('discover')}
@@ -774,20 +774,20 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                   {history.map(item => (
                     <div
                       key={item.id}
-                      className="p-3 rounded-xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between text-xs"
+                      className="p-3 rounded-xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between gap-3 text-xs"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#162130] flex items-center justify-center text-[#c6f135]">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#162130] flex items-center justify-center text-[#c6f135] shrink-0">
                           <Film className="w-4 h-4" />
                         </div>
-                        <div>
-                          <div className="font-bold text-white">{item.seriesTitle}</div>
-                          <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="min-w-0">
+                          <div className="font-bold text-white truncate">{item.seriesTitle}</div>
+                          <div className="text-[11px] text-slate-400 font-mono [overflow-wrap:anywhere]">
                             {item.episodeRange} · {item.fileCount} MP4 files · {item.totalSize}
                           </div>
                         </div>
                       </div>
-                      <span className="text-[11px] font-mono text-slate-500">{item.completedAt}</span>
+                      <span className="text-[11px] font-mono text-slate-500 shrink-0">{item.completedAt}</span>
                     </div>
                   ))}
                 </div>

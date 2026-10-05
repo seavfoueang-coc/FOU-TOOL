@@ -54,7 +54,7 @@ export default function App() {
   const currentTool = NEXUS_TOOLS.find(t => t.id === activeToolId);
 
   return (
-    <div className={`min-h-screen w-full max-w-full overflow-x-hidden transition-colors duration-200 ${
+    <div className={`min-h-screen w-full max-w-full transition-colors duration-200 ${
       darkMode ? 'bg-[#0a0d14] text-slate-100' : 'bg-slate-50 text-slate-900'
     }`}>
       {/* Top Navbar */}
@@ -72,7 +72,7 @@ export default function App() {
       />
 
       {/* Main Container: Mobile has 16px horizontal edge padding (12px on 320px), desktop unchanged */}
-      <main className="w-full max-w-full overflow-x-hidden px-3 min-[360px]:px-4 sm:px-5 lg:px-0 pb-10 sm:pb-6 md:pb-0 box-border">
+      <main className="w-full max-w-full px-3 min-[360px]:px-4 sm:px-5 lg:px-0 pb-10 sm:pb-6 md:pb-0 box-border">
         {activeToolId === 'hub' ? (
           /* MAIN VIEW: 4 BIG DIV BOXES + CREATOR & DEVELOPER SECTION (ONLY HERE) */
           <div className="animate-in fade-in duration-200">

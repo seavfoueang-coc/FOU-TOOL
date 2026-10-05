@@ -23,9 +23,9 @@ export const Hero: React.FC<HeroProps> = ({
 
   return (
     <section id="overview" className="relative pt-6 sm:pt-14 lg:pt-20 pb-8 sm:pb-14 overflow-hidden w-full max-w-full">
-      {/* Subtle ambient lime aura */}
+      {/* Subtle ambient lime aura (decorative; capped to the section width so it never relies on clipping) */}
       <div 
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] h-[220px] sm:h-[300px] bg-[#c6f135]/10 blur-[90px] sm:blur-[130px] pointer-events-none rounded-full" 
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(320px,100%)] sm:w-[600px] h-[220px] sm:h-[300px] bg-[#c6f135]/10 blur-[90px] sm:blur-[130px] pointer-events-none rounded-full" 
         aria-hidden="true"
       />
       

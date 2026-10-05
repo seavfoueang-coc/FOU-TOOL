@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Download, Moon, Sun, Languages, ChevronDown, Check, Zap, Layers, Grid, ArrowLeft, Menu, X, Heart, Send } from 'lucide-react';
+import React, { useCallback, useRef, useState } from 'react';
+import { Download, Moon, Sun, Languages, ChevronDown, Check, Grid, ArrowLeft, Menu } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../i18n/translations';
-import { NEXUS_TOOLS, NexusTool } from '../config/tools';
+import { NEXUS_TOOLS } from '../config/tools';
 import { FouToolLogo } from './FouToolLogo';
 import { HongguoLogo } from './HongguoLogo';
+import { MobileDrawer } from './MobileDrawer';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -27,6 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const t = TRANSLATIONS[lang];
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
   const currentTool = NEXUS_TOOLS.find(t => t.id === activeToolId);
   const isKm = lang === 'km';
 
@@ -43,8 +46,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         ? 'bg-[#0a0d14]/95 border-[#19212e] text-slate-100' 
         : 'bg-white/95 border-slate-200 text-slate-900'
     }`}>
-      {/* Main Nav Container: 60-64px height, 16px horizontal gutters */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-[60px] sm:h-16 flex items-center justify-between gap-3 w-full">
+      {/* Main Nav Container: 60-64px height; edge gutters match <main> (12px @320, 16px @360–639, 20px @sm), desktop unchanged */}
+      <div className="max-w-6xl mx-auto px-3 min-[360px]:px-4 sm:px-5 md:px-6 lg:px-8 h-[60px] sm:h-16 flex items-center justify-between gap-3 w-full">
         {/* Left Side: Brand Logo + Desktop Project Selector */}
         <div className="flex items-center gap-3 min-w-0">
           {/* Main Brand: FOU TOOL (Main website title image) */}
@@ -240,192 +243,34 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Mobile Header Right: Language switcher displayed directly on mobile + Hub back button + Hamburger */}
-        <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
-          {activeToolId !== 'hub' && (
-            <button
-              onClick={() => handleToolSelect('hub')}
-              className="h-9 px-2 sm:px-2.5 rounded-lg bg-[#141b26] border border-[#273549] text-[11px] font-bold text-[#c6f135] flex items-center gap-1 active:scale-95 transition-all shadow-sm shrink-0"
-              title="Back to All Tools"
-            >
-              <ArrowLeft className="w-3 h-3 shrink-0" />
-              <span>Hub</span>
-            </button>
-          )}
-
-          {/* Language Toggle Button directly visible on small devices */}
-          <button
-            onClick={onToggleLang}
-            aria-label="Toggle Language"
-            className={`h-9 px-2 sm:px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1 sm:gap-1.5 border transition-all cursor-pointer whitespace-nowrap active:scale-95 shrink-0 ${
-              darkMode 
-                ? 'border-[#263449] bg-[#141b26] text-slate-200 hover:border-[#c6f135]/60 hover:text-[#c6f135]' 
-                : 'border-slate-300 bg-white text-slate-800'
-            }`}
-          >
-            <Languages className="w-3.5 h-3.5 text-[#c6f135] shrink-0" />
-            <span className="font-mono text-[11px] font-bold">{lang === 'km' ? 'ខ្មែរ' : 'EN'}</span>
-          </button>
-
-          {/* Clean Hamburger Menu Button (touch target) */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`w-9 sm:w-10 h-9 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border active:scale-95 shrink-0 ${
-              mobileMenuOpen
-                ? 'bg-[#182333] border-[#c6f135]/60 text-[#c6f135]'
-                : 'bg-[#141b26] border-[#25354a] text-slate-200 hover:text-white'
-            }`}
-            aria-label="Toggle Mobile Menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
+        {/* Mobile Header Right (< 768px): single menu trigger. Tools Hub, language & theme live in the drawer. */}
+        <button
+          ref={menuButtonRef}
+          onClick={() => setMobileMenuOpen(true)}
+          className="md:hidden w-10 h-10 shrink-0 rounded-xl flex items-center justify-center transition-colors cursor-pointer border active:scale-95 bg-[#141b26] border-[#25354a] text-slate-200 hover:text-white"
+          aria-label="Open menu"
+          aria-haspopup="dialog"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-drawer"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* MOBILE COMPACT MENU / DROPDOWN (< 768px) */}
-      {mobileMenuOpen && (
-        <>
-          {/* Backdrop overlay */}
-          <div 
-            className="fixed inset-0 top-[60px] sm:top-16 z-40 bg-black/70 backdrop-blur-sm md:hidden animate-in fade-in duration-150"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-
-          {/* Drawer content */}
-          <div className="absolute top-full left-0 right-0 z-50 bg-[#0d121c] border-b border-[#213044] px-4 py-5 shadow-2xl space-y-4 max-h-[calc(100vh-68px)] overflow-y-auto md:hidden animate-in slide-in-from-top-2 duration-200">
-            {/* Header: Current Active Status */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b2536]">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">
-                {isKm ? 'ជ្រើសរើសឧបករណ៍' : 'TOOLS HUB'}
-              </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#c6f135]/20 text-[#c6f135] font-bold">
-                FOU TOOL Suite
-              </span>
-            </div>
-
-            {/* Tool Selector List */}
-            <div className="space-y-1.5">
-              {/* Return to 4 Boxes Hub */}
-              <button
-                onClick={() => handleToolSelect('hub')}
-                className={`w-full text-left p-3 rounded-xl flex items-center justify-between gap-3 transition-all cursor-pointer min-h-[48px] ${
-                  activeToolId === 'hub'
-                    ? 'bg-[#192434] border border-[#c6f135]/60 text-white shadow-sm'
-                    : 'bg-[#101724] border border-[#1d293b] text-slate-300 hover:bg-[#151f2e]'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-[#090d14] flex items-center justify-center shrink-0 border border-[#233348]">
-                    <Grid className="w-4 h-4 text-[#c6f135]" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold text-white truncate">
-                      {isKm ? 'ប្រអប់ឧបករណ៍ទាំង ៤ (Hub)' : 'All Tools Hub (4 Boxes)'}
-                    </div>
-                    <div className="text-[10px] text-slate-400 truncate">
-                      {isKm ? 'ទំព័រដើមនៃ FOU TOOL' : 'Main launcher portal'}
-                    </div>
-                  </div>
-                </div>
-                {activeToolId === 'hub' && <Check className="w-4 h-4 text-[#c6f135] shrink-0" />}
-              </button>
-
-              {/* 4 Tool Items */}
-              {NEXUS_TOOLS.map((tool) => {
-                const isSelected = tool.id === activeToolId;
-                return (
-                  <button
-                    key={tool.id}
-                    onClick={() => handleToolSelect(tool.id)}
-                    className={`w-full text-left p-3 rounded-xl flex items-center justify-between gap-3 transition-all cursor-pointer min-h-[48px] ${
-                      isSelected
-                        ? 'bg-[#192434] border border-[#c6f135]/60 text-white shadow-sm'
-                        : 'bg-[#101724] border border-[#1d293b] text-slate-300 hover:bg-[#151f2e]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-[#090d14] flex items-center justify-center shrink-0 border border-[#233348]">
-                        {tool.id === 'hongguo-dl' ? (
-                          <HongguoLogo size={20} />
-                        ) : (
-                          <span className="text-[10px] font-bold text-slate-300">{tool.name.slice(0, 2)}</span>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-white truncate">{tool.name}</span>
-                          {tool.status === 'active' && (
-                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#c6f135]/20 text-[#c6f135] font-bold shrink-0">
-                              Ready
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[10px] text-slate-400 truncate mt-0.5">
-                          {isKm && tool.khmerDesc ? tool.khmerDesc : tool.shortDesc}
-                        </div>
-                      </div>
-                    </div>
-                    {isSelected && <Check className="w-4 h-4 text-[#c6f135] shrink-0" />}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Quick Action when Hongguo DL is active */}
-            {activeToolId === 'hongguo-dl' && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenDownloadModal();
-                }}
-                className="w-full min-h-[48px] py-2.5 px-4 rounded-xl bg-[#c6f135] hover:bg-[#b5e028] text-black font-bold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-md cursor-pointer transition-all"
-              >
-                <Download className="w-4 h-4 shrink-0" />
-                <span>{t.getForWindows}</span>
-              </button>
-            )}
-
-            {/* Preferences Section: Language & Theme */}
-            <div className="pt-3 border-t border-[#1b2536] space-y-3">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">
-                {isKm ? 'ការកំណត់' : 'PREFERENCES'}
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {/* Language Toggle Button */}
-                <button
-                  onClick={onToggleLang}
-                  className="min-h-[44px] px-3 py-2 rounded-xl bg-[#141c28] border border-[#243347] flex items-center justify-center gap-2 text-xs font-bold text-slate-200 active:scale-95 transition-all cursor-pointer"
-                >
-                  <Languages className="w-4 h-4 text-[#c6f135] shrink-0" />
-                  <span>{lang === 'km' ? 'ភាសា: ខ្មែរ' : 'Language: EN'}</span>
-                </button>
-
-                {/* Theme Toggle Button */}
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  className="min-h-[44px] px-3 py-2 rounded-xl bg-[#141c28] border border-[#243347] flex items-center justify-center gap-2 text-xs font-bold text-slate-200 active:scale-95 transition-all cursor-pointer"
-                >
-                  {darkMode ? <Sun className="w-4 h-4 text-amber-300 shrink-0" /> : <Moon className="w-4 h-4 text-indigo-300 shrink-0" />}
-                  <span>{darkMode ? 'Dark Mode' : 'Light Mode'}</span>
-                </button>
-              </div>
-
-              {/* Telegram Support Link */}
-              <a
-                href="https://t.me/eangseavfou"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-[#121a26] border border-[#223348] text-xs font-medium text-slate-300 hover:text-white flex items-center justify-center gap-2 transition-all active:scale-95 no-underline"
-              >
-                <Send className="w-3.5 h-3.5 text-[#2aabee] shrink-0" />
-                <span>{isKm ? 'ទាក់ទងតាម Telegram (@eangseavfou)' : 'Contact Developer (@eangseavfou)'}</span>
-              </a>
-            </div>
-          </div>
-        </>
-      )}
+      {/* MOBILE SLIDE-OUT DRAWER (< 768px) */}
+      <MobileDrawer
+        open={mobileMenuOpen}
+        onClose={closeMobileMenu}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        lang={lang}
+        onToggleLang={onToggleLang}
+        activeToolId={activeToolId}
+        onSelectTool={handleToolSelect}
+        onOpenDownloadModal={onOpenDownloadModal}
+        downloadLabel={t.getForWindows}
+        returnFocusRef={menuButtonRef}
+      />
     </header>
   );
 };
