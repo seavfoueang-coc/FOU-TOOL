@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { SAMPLE_SERIES } from '../data/mockData';
-import { DramaSeries, DownloadTask, HistoryItem } from '../types/app';
-import { Language, TRANSLATIONS } from '../i18n/translations';
 import { 
-  Search, Download, Clock, Activity, Settings, ExternalLink, 
-  Clipboard, Film, Sliders, Play, Pause, XCircle, CheckCircle2, 
-  Folder, RefreshCw, Check, Eye, Sun, Moon, Send, ArrowRight
+  Search, 
+  Download, 
+  Clock, 
+  Activity, 
+  Settings, 
+  ExternalLink, 
+  Clipboard, 
+  Sliders, 
+  Check, 
+  RefreshCw, 
+  Film, 
+  Folder, 
+  Eye, 
+  Play, 
+  Pause, 
+  XCircle, 
+  Trash2, 
+  Moon, 
+  Sun,
+  ShieldCheck,
+  Send,
+  Zap
 } from 'lucide-react';
+import { Language, TRANSLATIONS } from '../i18n/translations';
+import { SAMPLE_SERIES } from '../data/mockData';
+import { DramaSeries } from '../types/app';
+import { HongguoLogo } from './HongguoLogo';
 
 interface AppSimulatorProps {
   externalDarkMode: boolean;
@@ -14,233 +34,202 @@ interface AppSimulatorProps {
   onToggleLang?: () => void;
 }
 
-export const AppSimulator: React.FC<AppSimulatorProps> = ({ 
-  externalDarkMode, 
+interface TransferTask {
+  id: string;
+  seriesTitle: string;
+  episodeNumber: number;
+  progress: number;
+  speed: string;
+  status: 'downloading' | 'decrypting' | 'completed' | 'paused';
+  fileSize: string;
+  downloadedBytes: string;
+}
+
+interface HistoryItem {
+  id: string;
+  seriesTitle: string;
+  episodeRange: string;
+  completedAt: string;
+  fileCount: number;
+  totalSize: string;
+}
+
+export const AppSimulator: React.FC<AppSimulatorProps> = ({
+  externalDarkMode,
   lang,
-  onToggleLang 
 }) => {
   const t = TRANSLATIONS[lang];
 
-  // App internal state
+  // Simulator Internal State
   const [internalDarkMode, setInternalDarkMode] = useState(true);
   const [activeTab, setActiveTab] = useState<'discover' | 'transfers' | 'history' | 'log' | 'preferences'>('discover');
-  
-  // Discover view states
-  const [hasInspected, setHasInspected] = useState(false);
   const [inputUrl, setInputUrl] = useState('https://hongguoduanju.com/detail?series_id=7391840291');
-  const [currentSeries, setCurrentSeries] = useState<DramaSeries>(SAMPLE_SERIES[0]);
   const [isParsing, setIsParsing] = useState(false);
-  const [selectedEpisodes, setSelectedEpisodes] = useState<number[]>([1, 2, 3, 4, 5, 6]);
+  const [hasInspected, setHasInspected] = useState(false);
+  const [currentSeries, setCurrentSeries] = useState<DramaSeries>(SAMPLE_SERIES[0]);
+  const [selectedEpisodes, setSelectedEpisodes] = useState<number[]>([1, 2, 3, 4, 5]);
 
-  // Transfers queue state
-  const [tasks, setTasks] = useState<DownloadTask[]>([
+  // Tasks in Transfers
+  const [tasks, setTasks] = useState<TransferTask[]>([
     {
-      id: 'task-1',
-      seriesId: SAMPLE_SERIES[0].id,
-      seriesTitle: SAMPLE_SERIES[0].title,
+      id: 't-1',
+      seriesTitle: '顾总的隐婚甜妻 (Sweet Secret Bride)',
       episodeNumber: 1,
       progress: 100,
-      downloadSpeed: '0 MB/s',
-      totalBytes: 19300000,
-      downloadedBytes: 19300000,
+      speed: '0 KB/s',
       status: 'completed',
-      partFile: 'EP001_Banquet_Betrayal.part',
-      targetFile: 'EP001 - Banquet Betrayal.mp4',
-      sourceType: 'mobile_api',
-      retryCount: 0,
+      fileSize: '42.8 MB',
+      downloadedBytes: '42.8 MB',
     },
     {
-      id: 'task-2',
-      seriesId: SAMPLE_SERIES[0].id,
-      seriesTitle: SAMPLE_SERIES[0].title,
+      id: 't-2',
+      seriesTitle: '顾总的隐婚甜妻 (Sweet Secret Bride)',
       episodeNumber: 2,
-      progress: 88,
-      downloadSpeed: '8.4 MB/s',
-      totalBytes: 21400000,
-      downloadedBytes: 18832000,
-      status: 'decrypting',
-      partFile: 'EP002_Awakening_at_Dusk.part',
-      targetFile: 'EP002 - Awakening at Dusk.mp4',
-      sourceType: 'mobile_api',
-      retryCount: 0,
+      progress: 68,
+      speed: '3.4 MB/s',
+      status: 'downloading',
+      fileSize: '45.1 MB',
+      downloadedBytes: '30.6 MB',
     },
     {
-      id: 'task-3',
-      seriesId: SAMPLE_SERIES[0].id,
-      seriesTitle: SAMPLE_SERIES[0].title,
+      id: 't-3',
+      seriesTitle: '顾总的隐婚甜妻 (Sweet Secret Bride)',
       episodeNumber: 3,
-      progress: 54,
-      downloadSpeed: '7.1 MB/s',
-      totalBytes: 20500000,
-      downloadedBytes: 11070000,
+      progress: 24,
+      speed: '2.8 MB/s',
       status: 'downloading',
-      partFile: 'EP003_Unraveling_the_Poison.part',
-      targetFile: 'EP003 - Unraveling the Poison.mp4',
-      sourceType: 'mobile_api',
-      retryCount: 0,
+      fileSize: '39.7 MB',
+      downloadedBytes: '9.5 MB',
     },
   ]);
 
-  // History state
+  // History Items
   const [history, setHistory] = useState<HistoryItem[]>([
     {
-      id: 'hist-1',
-      seriesTitle: SAMPLE_SERIES[0].title,
-      episodeNumber: 1,
-      filePath: 'D:\\HongguoDramas\\The Reborn Empress of Jiangnan\\EP001 - Banquet Betrayal.mp4',
-      fileSizeMb: 19.3,
-      completedAt: 'Just now',
-      duration: '01:42',
-      resolution: '1080p 60fps',
+      id: 'h-1',
+      seriesTitle: '顾总的隐婚甜妻',
+      episodeRange: 'Ep 01 – 15',
+      completedAt: 'Today, 10:14 AM',
+      fileCount: 15,
+      totalSize: '624.5 MB',
+    },
+    {
+      id: 'h-2',
+      seriesTitle: '重生成首富的继承人',
+      episodeRange: 'Ep 01 – 30',
+      completedAt: 'Yesterday, 04:22 PM',
+      fileCount: 30,
+      totalSize: '1.2 GB',
+    },
+    {
+      id: 'h-3',
+      seriesTitle: '战神回归都市',
+      episodeRange: 'Ep 01 – 10',
+      completedAt: 'Oct 03, 2026',
+      fileCount: 10,
+      totalSize: '412.0 MB',
     },
   ]);
 
-  // System logs
+  // System Logs
   const [logs, setLogs] = useState<string[]>([
-    '[10:42:01] [Core] HONGGUO DL Engine v1.4.2 started in sandboxed V8 bytecode VM',
-    '[10:42:02] [Auth] Generated synthetic Android device ID: a6f9b8c01d423e88',
-    '[10:42:05] [Scraper] Connected to hongguoduanju.com/series/7391840291 (Status: 200 OK)',
-    '[10:42:06] [Scraper] Parsed catalog: "The Reborn Empress of Jiangnan", 80 episodes indexed',
-    '[10:42:10] [Engine] Worker pool initialized with concurrency limit: 2 parallel streams',
-    '[10:42:15] [Crypto] Derived AES XOR transformation key from mobile payload header',
-    '[10:42:20] [Transfer] EP001 decrypted and committed to disk. Byte completeness verified.',
+    '[10:42:01] [Core] HONGGUO DL Engine v1.0.0 started in sandboxed Windows runtime',
+    '[10:42:02] [Network] Custom bypass headers initialized for hongguoduanju.com',
+    '[10:42:02] [Storage] Output directory confirmed: C:\\Users\\User\\Videos\\Hongguo',
+    '[10:42:15] [Parser] Inspected series_id=7391840291 (80 Episodes detected)',
+    '[10:42:18] [Worker 1] Downloaded episode 01 (SHA-256 integrity verified)',
+    '[10:42:19] [Decryptor] AES-128-CBC payload unlocked, clean MP4 remux complete',
+    '[10:42:22] [Worker 2] Downloading episode 02 (68% - 3.4 MB/s)',
   ]);
 
-  // Settings
-  const [concurrency, setConcurrency] = useState<number>(2);
-  const [downloadFolder, setDownloadFolder] = useState('D:\\HongguoDramas');
-  const [autoDecrypt, setAutoDecrypt] = useState(true);
-  const [selectedQuality, setSelectedQuality] = useState<'1080p' | '720p'>('1080p');
+  // Toast / feedback message
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Video preview modal
-  const [previewingItem, setPreviewingItem] = useState<HistoryItem | null>(null);
-
-  // Live progress simulation
+  // Sync external dark mode
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTasks(prevTasks => {
-        return prevTasks.map(t => {
-          if (t.status === 'downloading') {
-            const nextProgress = Math.min(100, t.progress + Math.floor(Math.random() * 8) + 4);
-            if (nextProgress >= 100) {
-              return {
-                ...t,
-                progress: 100,
-                status: 'decrypting',
-                downloadSpeed: 'Decrypting...',
-              };
-            }
-            return {
-              ...t,
-              progress: nextProgress,
-              downloadSpeed: `${(6.0 + Math.random() * 3.5).toFixed(1)} MB/s`,
-            };
-          } else if (t.status === 'decrypting') {
-            const shouldFinish = Math.random() > 0.45;
-            if (shouldFinish) {
-              const newHistItem: HistoryItem = {
-                id: `hist-${Date.now()}-${t.episodeNumber}`,
-                seriesTitle: t.seriesTitle,
-                episodeNumber: t.episodeNumber,
-                filePath: `${downloadFolder}\\${t.seriesTitle}\\${t.targetFile}`,
-                fileSizeMb: Number((t.totalBytes / (1024 * 1024)).toFixed(1)),
-                completedAt: 'Just now',
-                duration: '01:45',
-                resolution: '1080p',
-              };
-              setHistory(h => [newHistItem, ...h.filter(item => !(item.seriesTitle === t.seriesTitle && item.episodeNumber === t.episodeNumber))]);
-              setLogs(l => [`[${new Date().toLocaleTimeString()}] [Transfer] Saved ${t.targetFile} to ${downloadFolder}`, ...l.slice(0, 40)]);
-              return {
-                ...t,
-                status: 'completed',
-                downloadSpeed: '0 MB/s',
-              };
-            }
-          }
-          return t;
-        });
-      });
-    }, 1200);
+    setInternalDarkMode(externalDarkMode);
+  }, [externalDarkMode]);
 
-    return () => clearInterval(interval);
-  }, [downloadFolder]);
+  // Show Toast
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 2800);
+  };
 
-  // Inspect link handler
+  // Simulated Paste
+  const handlePaste = () => {
+    setInputUrl('https://hongguoduanju.com/detail?series_id=7391840291');
+    triggerToast('Pasted Hongguo series link');
+  };
+
+  // Simulated Inspect Action
   const handleInspect = () => {
     setIsParsing(true);
-    setLogs(l => [`[${new Date().toLocaleTimeString()}] [Scraper] Handshaking with URL: ${inputUrl}`, ...l]);
     setTimeout(() => {
-      const match = SAMPLE_SERIES.find(s => inputUrl.includes(s.id) || s.sampleUrl === inputUrl) || SAMPLE_SERIES[0];
-      setCurrentSeries(match);
-      setHasInspected(true);
       setIsParsing(false);
-      setLogs(l => [`[${new Date().toLocaleTimeString()}] [Scraper] Parsed: "${match.title}" (${match.totalEpisodes} episodes)`, ...l]);
-    }, 600);
+      setHasInspected(true);
+      setCurrentSeries(SAMPLE_SERIES[0]);
+      triggerToast(`Successfully parsed 80 episodes!`);
+      setLogs(prev => [
+        `[${new Date().toLocaleTimeString()}] [Parser] Parsed series ID: 7391840291 with 80 episodes`,
+        ...prev
+      ]);
+    }, 900);
   };
 
-  const handlePaste = async () => {
-    try {
-      if (navigator.clipboard) {
-        const text = await navigator.clipboard.readText();
-        if (text) setInputUrl(text);
-      }
-    } catch {
-      setInputUrl(SAMPLE_SERIES[1].sampleUrl);
-    }
-  };
-
-  // Toggle episode
+  // Toggle Episode selection
   const toggleEpisode = (epNum: number) => {
     if (selectedEpisodes.includes(epNum)) {
-      setSelectedEpisodes(selectedEpisodes.filter(n => n !== epNum));
+      setSelectedEpisodes(selectedEpisodes.filter(e => e !== epNum));
     } else {
       setSelectedEpisodes([...selectedEpisodes, epNum].sort((a, b) => a - b));
     }
   };
 
-  // Start downloads
-  const startDownloadBatch = () => {
-    const newTasks: DownloadTask[] = selectedEpisodes.map(epNum => {
-      const ep = currentSeries.episodes.find(e => e.episodeNumber === epNum);
-      const isAlreadyCompleted = history.some(h => h.seriesTitle === currentSeries.title && h.episodeNumber === epNum);
-      
-      return {
-        id: `task-${Date.now()}-${epNum}`,
-        seriesId: currentSeries.id,
-        seriesTitle: currentSeries.title,
-        episodeNumber: epNum,
-        progress: isAlreadyCompleted ? 100 : 0,
-        downloadSpeed: isAlreadyCompleted ? 'Skipped' : 'Connecting...',
-        totalBytes: (ep?.fileSizeMb || 20) * 1024 * 1024,
-        downloadedBytes: isAlreadyCompleted ? (ep?.fileSizeMb || 20) * 1024 * 1024 : 0,
-        status: isAlreadyCompleted ? 'completed' : 'downloading',
-        partFile: `EP${String(epNum).padStart(3, '0')}_${(ep?.title || 'Episode').replace(/[^a-zA-Z0-9]/g, '_')}.part`,
-        targetFile: `EP${String(epNum).padStart(3, '0')} - ${(ep?.title || 'Episode').replace(/[^a-zA-Z0-9 ]/g, '')}.mp4`,
-        sourceType: 'mobile_api',
-        retryCount: 0,
-      };
-    });
+  // Start Download
+  const handleStartDownload = () => {
+    if (selectedEpisodes.length === 0) {
+      triggerToast('Please select at least 1 episode');
+      return;
+    }
 
-    setTasks(prev => [...newTasks, ...prev.filter(t => !selectedEpisodes.includes(t.episodeNumber))]);
+    const newTasks: TransferTask[] = selectedEpisodes.slice(0, 3).map((ep, idx) => ({
+      id: `task-${Date.now()}-${ep}`,
+      seriesTitle: currentSeries.chineseTitle,
+      episodeNumber: ep,
+      progress: idx === 0 ? 30 : idx === 1 ? 12 : 5,
+      speed: `${(2.5 + Math.random() * 2).toFixed(1)} MB/s`,
+      status: 'downloading',
+      fileSize: `${(38 + Math.random() * 8).toFixed(1)} MB`,
+      downloadedBytes: '12.4 MB',
+    }));
+
+    setTasks([...newTasks, ...tasks]);
     setActiveTab('transfers');
-    setLogs(l => [`[${new Date().toLocaleTimeString()}] [Queue] Added ${selectedEpisodes.length} episodes to transfer queue`, ...l]);
+    triggerToast(`Added ${selectedEpisodes.length} episodes to Transfer Queue!`);
+    setLogs(prev => [
+      `[${new Date().toLocaleTimeString()}] [TransferQueue] Added ${selectedEpisodes.length} episodes for batch export`,
+      ...prev
+    ]);
   };
 
   const activeDownloadingCount = tasks.filter(t => t.status === 'downloading' || t.status === 'decrypting').length;
 
   return (
-    <section id="simulator" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="simulator" className="py-14 sm:py-20 w-full max-w-5xl mx-auto lg:px-8 box-border">
       {/* Section Header */}
-      <div className="max-w-3xl mb-8">
-        <div className="flex items-center gap-2 text-xs font-semibold text-[#c6f135] uppercase tracking-wider mb-2">
+      <div className="max-w-2xl mb-8">
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#c6f135] uppercase tracking-wider mb-2 font-mono">
           <span>{lang === 'km' ? 'ផ្ទាំងកម្មវិធីជាក់ស្ដែង' : 'Interactive App Sandbox'}</span>
           <span aria-hidden="true">·</span>
           <span>{lang === 'km' ? 'កូពីតាមចំណុចប្រទាក់ពិត 1:1' : '1:1 Pixel-Accurate UI Mirror'}</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-balance">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight mb-3 text-white leading-tight">
           {lang === 'km' ? 'បទពិសោធន៍ផ្ទាល់ជាមួយ HONGGUO DL' : 'Experience HONGGUO DL exactly as it runs on Windows.'}
         </h2>
-        <p className="text-slate-400 text-base leading-relaxed text-balance">
+        <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
           {lang === 'km' 
             ? 'ចំណុចប្រទាក់ពិតប្រាកដដែលបានបង្កើតឡើង៖ ការរុករក Discover ជាមួយប៊ូតុង Inspect ពណ៌បៃតងខ្ចី ការទាញយក Transfers និងកំណត់ត្រាប្រព័ន្ធ។'
             : 'Explore the authentic custom dark design system: electric lime Discover navigation, multi-worker Transfers queue, real-time System logs, and Windows Explorer export.'}
@@ -254,13 +243,11 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
           : 'bg-white border-slate-300 text-slate-800'
       }`}>
         {/* Windows Titlebar */}
-        <div className={`h-10 border-b px-4 flex items-center justify-between select-none ${
+        <div className={`h-9 border-b px-4 flex items-center justify-between select-none ${
           internalDarkMode ? 'bg-[#0a0d14] border-[#18202d]' : 'bg-slate-100 border-slate-200'
         }`}>
-          <div className="flex items-center gap-2.5">
-            <div className="w-4 h-4 rounded-sm bg-[#161f2e] border border-[#c6f135]/60 flex items-center justify-center text-[9px] font-bold text-[#c6f135]">
-              HG
-            </div>
+          <div className="flex items-center gap-2">
+            <HongguoLogo size={18} />
             <span className="text-xs font-semibold tracking-wide text-slate-300">
               HONGGUO DL
             </span>
@@ -274,62 +261,61 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
         </div>
 
         {/* Top Header Row inside App */}
-        <div className={`h-16 px-6 border-b flex items-center justify-between ${
+        <div className={`h-14 sm:h-16 px-4 sm:px-6 border-b flex items-center justify-between ${
           internalDarkMode ? 'bg-[#0a0d14] border-[#18202d]' : 'bg-slate-50 border-slate-200'
         }`}>
           {/* Logo Lockup matching screenshot */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#141b26] border border-[#c6f135]/40 flex items-center justify-center shadow-inner relative">
-              <span className="font-extrabold text-sm text-[#c6f135] tracking-tighter">HG</span>
-              <span className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-[#c6f135]"></span>
+            <div className="shrink-0 flex items-center">
+              <HongguoLogo size={36} />
             </div>
             <div>
-              <div className="text-base font-extrabold tracking-tight flex items-center gap-1.5">
+              <div className="text-sm sm:text-base font-extrabold tracking-tight flex items-center gap-1 leading-none">
                 <span className="text-white">HONGGUO</span>
                 <span className="text-[#c6f135]">DL</span>
               </div>
-              <div className="text-[10px] font-medium tracking-widest uppercase text-slate-500 font-mono">
+              <div className="text-[9px] font-medium tracking-widest uppercase text-slate-500 font-mono mt-0.5">
                 {t.brandSubtitle}
               </div>
             </div>
           </div>
 
-          {/* Top Right Controls: Status pill + Theme toggle + Language */}
-          <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${
+          {/* Top Right Controls: Status pill + Theme toggle */}
+          <div className="flex items-center gap-2.5">
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
               internalDarkMode ? 'bg-[#141b26] border-[#222d3d] text-slate-300' : 'bg-white border-slate-200 text-slate-700'
             }`}>
               <span className={`w-2 h-2 rounded-full ${activeDownloadingCount > 0 ? 'bg-[#c6f135] animate-pulse' : 'bg-[#c6f135]'}`}></span>
-              <span>{activeDownloadingCount > 0 ? `${activeDownloadingCount} ${t.statusActive}` : t.statusReady}</span>
+              <span className="text-[11px] sm:text-xs">{activeDownloadingCount > 0 ? `${activeDownloadingCount} ${t.statusActive}` : t.statusReady}</span>
             </div>
 
             <button
               onClick={() => setInternalDarkMode(!internalDarkMode)}
               title="Toggle simulator theme"
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
             >
-              {internalDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {internalDarkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
 
         {/* Main Body: Sidebar + Main Stage */}
-        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[640px]">
-          {/* Sidebar */}
-          <div className={`md:col-span-3 border-r p-4 flex flex-col justify-between ${
+        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[580px]">
+          {/* Sidebar: Horizontal scrollable strip on mobile, vertical 1:1 Windows software sidebar on desktop */}
+          <div className={`md:col-span-3 border-b md:border-b-0 md:border-r p-3 sm:p-4 flex flex-col justify-between ${
             internalDarkMode ? 'bg-[#0a0d14] border-[#18202d]' : 'bg-slate-50 border-slate-200'
           }`}>
-            <div className="space-y-6">
+            <div className="space-y-3 md:space-y-5">
               <div>
-                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 font-mono">
+                <div className="hidden md:block text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 font-mono">
                   {t.workspace}
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="flex md:flex-col gap-1.5 overflow-x-auto pb-1 md:pb-0">
                   {/* Discover Button - Signature Lime Active Pill */}
                   <button
                     onClick={() => setActiveTab('discover')}
-                    className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold flex items-center gap-3 transition-all ${
+                    className={`whitespace-nowrap shrink-0 md:w-full text-left px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeTab === 'discover'
                         ? 'bg-[#c6f135] text-black shadow-lg shadow-[#c6f135]/25 font-bold'
                         : internalDarkMode
@@ -344,7 +330,7 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                   {/* Transfers Button */}
                   <button
                     onClick={() => setActiveTab('transfers')}
-                    className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-medium flex items-center justify-between transition-all ${
+                    className={`whitespace-nowrap shrink-0 md:w-full text-left px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between gap-2 transition-all cursor-pointer ${
                       activeTab === 'transfers'
                         ? 'bg-[#c6f135] text-black shadow-lg shadow-[#c6f135]/25 font-bold'
                         : internalDarkMode
@@ -352,12 +338,12 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <Download className="w-4 h-4 shrink-0" />
                       <span>{t.tabTransfers}</span>
                     </div>
                     {activeDownloadingCount > 0 && (
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-mono ${
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono ${
                         activeTab === 'transfers' ? 'bg-black text-[#c6f135]' : 'bg-[#c6f135] text-black font-bold'
                       }`}>
                         {activeDownloadingCount}
@@ -368,7 +354,7 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                   {/* History Button */}
                   <button
                     onClick={() => setActiveTab('history')}
-                    className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-medium flex items-center justify-between transition-all ${
+                    className={`whitespace-nowrap shrink-0 md:w-full text-left px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between gap-2 transition-all cursor-pointer ${
                       activeTab === 'history'
                         ? 'bg-[#c6f135] text-black shadow-lg shadow-[#c6f135]/25 font-bold'
                         : internalDarkMode
@@ -376,17 +362,17 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <Clock className="w-4 h-4 shrink-0" />
                       <span>{t.tabHistory}</span>
                     </div>
-                    <span className="text-xs font-mono text-slate-500">{history.length}</span>
+                    <span className="text-[11px] font-mono text-slate-500">{history.length}</span>
                   </button>
 
                   {/* System Log Button */}
                   <button
                     onClick={() => setActiveTab('log')}
-                    className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-medium flex items-center gap-3 transition-all ${
+                    className={`whitespace-nowrap shrink-0 md:w-full text-left px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeTab === 'log'
                         ? 'bg-[#c6f135] text-black shadow-lg shadow-[#c6f135]/25 font-bold'
                         : internalDarkMode
@@ -401,7 +387,7 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                   {/* Preferences Button */}
                   <button
                     onClick={() => setActiveTab('preferences')}
-                    className={`w-full text-left px-4 py-3 rounded-2xl text-sm font-medium flex items-center gap-3 transition-all ${
+                    className={`whitespace-nowrap shrink-0 md:w-full text-left px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeTab === 'preferences'
                         ? 'bg-[#c6f135] text-black shadow-lg shadow-[#c6f135]/25 font-bold'
                         : internalDarkMode
@@ -416,14 +402,14 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
               </div>
             </div>
 
-            {/* Sidebar Bottom: Creator pill & run status */}
-            <div className="space-y-3 pt-6">
+            {/* Sidebar Bottom: Creator pill & run status (Desktop only) */}
+            <div className="hidden md:block space-y-3 pt-5">
               {/* Creator Card */}
-              <div className={`p-3 rounded-2xl border flex items-center gap-3 ${
+              <div className={`p-2.5 rounded-xl border flex items-center gap-2.5 ${
                 internalDarkMode ? 'bg-[#111722] border-[#1d2737]' : 'bg-white border-slate-200'
               }`}>
-                <div className="w-8 h-8 rounded-full bg-[#2aabee] flex items-center justify-center text-white shrink-0 shadow-md">
-                  <Send className="w-4 h-4 ml-0.5" />
+                <div className="w-7 h-7 rounded-full bg-[#2aabee] flex items-center justify-center text-white shrink-0 shadow-sm">
+                  <Send className="w-3.5 h-3.5 ml-0.5" />
                 </div>
                 <div>
                   <div className="text-[9px] font-mono tracking-wider uppercase text-slate-500">
@@ -444,67 +430,67 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
           </div>
 
           {/* Main Stage Content */}
-          <div className="md:col-span-9 p-6 md:p-8 flex flex-col justify-between overflow-y-auto">
+          <div className="md:col-span-9 p-4 sm:p-6 flex flex-col justify-between overflow-y-auto">
             {/* VIEW: DISCOVER (Exact match to the provided screenshot) */}
             {activeTab === 'discover' && (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {/* Header Text */}
                 <div>
-                  <div className="text-[11px] font-mono font-bold tracking-widest uppercase text-slate-500 mb-2">
+                  <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-slate-500 mb-1">
                     {t.shortDramaOffline}
                   </div>
-                  <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-2">
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-1">
                     {t.appHeadline}
                   </h3>
-                  <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+                  <p className="text-xs text-slate-400 max-w-xl">
                     {t.appDescription}
                   </p>
                 </div>
 
                 {/* Search Bar / Input Card */}
-                <div className="space-y-2.5">
-                  <div className={`p-1.5 rounded-2xl border flex flex-col sm:flex-row items-center gap-2 transition-all ${
+                <div className="space-y-2">
+                  <div className={`p-1.5 rounded-2xl border flex flex-col sm:flex-row items-stretch sm:items-center gap-2 transition-all ${
                     internalDarkMode 
                       ? 'bg-[#111722] border-[#202b3d] focus-within:border-[#c6f135]/70' 
                       : 'bg-white border-slate-300 focus-within:border-[#c6f135]'
                   }`}>
-                    <div className="flex items-center gap-3 pl-3 w-full sm:w-auto flex-1">
-                      <Search className="w-5 h-5 text-slate-500 shrink-0" />
+                    <div className="flex items-center gap-2 pl-2 sm:pl-3 w-full sm:w-auto flex-1">
+                      <Search className="w-4 h-4 text-slate-500 shrink-0" />
                       <input
                         type="text"
                         value={inputUrl}
                         onChange={e => setInputUrl(e.target.value)}
                         placeholder={t.inputPlaceholder}
-                        className="w-full bg-transparent text-xs sm:text-sm font-mono text-slate-100 placeholder-slate-500 focus:outline-none"
+                        className="w-full bg-transparent text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none min-w-0"
                       />
                     </div>
 
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end pr-1 pb-1 sm:pb-0">
+                    <div className="flex items-center gap-1.5 justify-end pr-1">
                       <button
                         onClick={() => window.open('https://hongguoduanju.com', '_blank')}
-                        className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#161f2e] hover:bg-[#1d293d] text-slate-300 flex items-center gap-1.5 border border-[#263449] transition-colors"
+                        className="px-2.5 py-1.5 text-[11px] font-semibold rounded-xl bg-[#161f2e] hover:bg-[#1d293d] text-slate-300 flex items-center gap-1 border border-[#263449] transition-colors cursor-pointer"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <ExternalLink className="w-3 h-3" />
                         <span>{t.btnOpenWebsite}</span>
                       </button>
 
                       <button
                         onClick={handlePaste}
-                        className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#161f2e] hover:bg-[#1d293d] text-slate-300 flex items-center gap-1.5 border border-[#263449] transition-colors"
+                        className="px-2.5 py-1.5 text-[11px] font-semibold rounded-xl bg-[#161f2e] hover:bg-[#1d293d] text-slate-300 flex items-center gap-1 border border-[#263449] transition-colors cursor-pointer"
                       >
-                        <Clipboard className="w-3.5 h-3.5" />
+                        <Clipboard className="w-3 h-3" />
                         <span>{t.btnPaste}</span>
                       </button>
 
                       <button
                         onClick={handleInspect}
                         disabled={isParsing}
-                        className="px-5 py-2 text-xs font-bold rounded-xl bg-[#c6f135] hover:bg-[#b5e028] text-black flex items-center gap-1.5 shadow-md shadow-[#c6f135]/20 transition-all active:scale-95 disabled:opacity-50"
+                        className="px-4 py-1.5 text-[11px] font-bold rounded-xl bg-[#c6f135] hover:bg-[#b5e028] text-black flex items-center gap-1 shadow-md shadow-[#c6f135]/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                       >
                         {isParsing ? (
-                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                         ) : (
-                          <Search className="w-4 h-4" />
+                          <Search className="w-3.5 h-3.5" />
                         )}
                         <span>{t.btnInspect}</span>
                       </button>
@@ -512,105 +498,105 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                   </div>
 
                   {/* Quality & Parallel indicator */}
-                  <div className="flex items-center gap-2 text-xs font-mono text-slate-500 px-2">
-                    <Sliders className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="flex items-center gap-2 text-[11px] font-mono text-slate-500 px-1">
+                    <Sliders className="w-3 h-3 text-slate-400" />
                     <span>{t.bestQualityParallel}</span>
                   </div>
                 </div>
 
                 {/* Discover Canvas: Initial Hero State OR Inspected Series Grid */}
                 {!hasInspected ? (
-                  /* Initial State Container - Direct match to screenshot! */
-                  <div className="relative rounded-3xl border border-[#1b2536] bg-[#0b0e14] p-8 sm:p-12 text-center overflow-hidden">
+                  /* Initial State Container - Faithful compact mirror to screenshot */
+                  <div className="relative rounded-2xl border border-[#1b2536] bg-[#0b0e14] p-6 sm:p-8 text-center overflow-hidden">
                     {/* Subtle grid background pattern */}
                     <div 
-                      className="absolute inset-0 opacity-[0.08] pointer-events-none"
+                      className="absolute inset-0 opacity-[0.06] pointer-events-none"
                       style={{
                         backgroundImage: `linear-gradient(#c6f135 1px, transparent 1px), linear-gradient(to right, #c6f135 1px, transparent 1px)`,
-                        backgroundSize: '32px 32px'
+                        backgroundSize: '24px 24px'
                       }}
                     />
 
                     {/* Glowing Center Film Icon */}
                     <div className="relative z-10 flex flex-col items-center">
-                      <div className="w-20 h-20 rounded-2xl bg-[#121924] border border-[#c6f135]/40 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(198,241,53,0.15)]">
-                        <Film className="w-9 h-9 text-[#c6f135]" />
+                      <div className="w-14 h-14 rounded-2xl bg-[#121924] border border-[#c6f135]/40 flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(198,241,53,0.12)]">
+                        <Film className="w-7 h-7 text-[#c6f135]" />
                       </div>
 
-                      <div className="text-[11px] font-mono font-bold tracking-widest text-slate-500 uppercase mb-2">
+                      <div className="text-[10px] font-mono font-bold tracking-widest text-slate-500 uppercase mb-1">
                         {t.startHere}
                       </div>
 
-                      <h4 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+                      <h4 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-1">
                         {t.startHeroTitle}
                       </h4>
 
-                      <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mb-10 leading-relaxed">
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6 leading-relaxed">
                         {t.startHeroDesc}
                       </p>
 
                       {/* 3 Steps Cards */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl text-left">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full text-left">
                         {/* Step 1 */}
-                        <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] relative">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-mono font-bold text-[#c6f135]">01</span>
-                            <div className="w-7 h-7 rounded-full bg-[#1b2738] flex items-center justify-center text-[#c6f135]">
-                              <Clipboard className="w-3.5 h-3.5" />
+                        <div className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-mono font-bold text-[#c6f135]">01</span>
+                            <div className="w-6 h-6 rounded-full bg-[#1b2738] flex items-center justify-center text-[#c6f135]">
+                              <Clipboard className="w-3 h-3" />
                             </div>
                           </div>
-                          <div className="font-bold text-sm text-white mb-1">{t.step1Title}</div>
-                          <div className="text-xs text-slate-400 leading-relaxed">{t.step1Desc}</div>
+                          <div className="font-bold text-xs text-white mb-0.5">{t.step1Title}</div>
+                          <div className="text-[11px] text-slate-400 leading-relaxed">{t.step1Desc}</div>
                         </div>
 
                         {/* Step 2 */}
-                        <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] relative">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-mono font-bold text-[#c6f135]">02</span>
-                            <div className="w-7 h-7 rounded-full bg-[#1b2738] flex items-center justify-center text-[#c6f135]">
-                              <Sliders className="w-3.5 h-3.5" />
+                        <div className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-mono font-bold text-[#c6f135]">02</span>
+                            <div className="w-6 h-6 rounded-full bg-[#1b2738] flex items-center justify-center text-[#c6f135]">
+                              <Sliders className="w-3 h-3" />
                             </div>
                           </div>
-                          <div className="font-bold text-sm text-white mb-1">{t.step2Title}</div>
-                          <div className="text-xs text-slate-400 leading-relaxed">{t.step2Desc}</div>
+                          <div className="font-bold text-xs text-white mb-0.5">{t.step2Title}</div>
+                          <div className="text-[11px] text-slate-400 leading-relaxed">{t.step2Desc}</div>
                         </div>
 
                         {/* Step 3 */}
-                        <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] relative">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-mono font-bold text-[#c6f135]">03</span>
-                            <div className="w-7 h-7 rounded-full bg-[#1b2738] flex items-center justify-center text-[#c6f135]">
-                              <Download className="w-3.5 h-3.5" />
+                        <div className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-mono font-bold text-[#c6f135]">03</span>
+                            <div className="w-6 h-6 rounded-full bg-[#1b2738] flex items-center justify-center text-[#c6f135]">
+                              <Download className="w-3 h-3" />
                             </div>
                           </div>
-                          <div className="font-bold text-sm text-white mb-1">{t.step3Title}</div>
-                          <div className="text-xs text-slate-400 leading-relaxed">{t.step3Desc}</div>
+                          <div className="font-bold text-xs text-white mb-0.5">{t.step3Title}</div>
+                          <div className="text-[11px] text-slate-400 leading-relaxed">{t.step3Desc}</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 ) : (
                   /* Inspected Series View */
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                     {/* Series Overview Card */}
-                    <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] flex flex-col sm:flex-row gap-5 items-start">
-                      <div className={`w-24 h-32 rounded-xl bg-gradient-to-br ${currentSeries.coverGradient} shadow-xl shrink-0 flex flex-col justify-between p-3 text-white`}>
-                        <span className="text-[10px] font-mono opacity-80">红果</span>
+                    <div className="p-4 rounded-2xl bg-[#111722] border border-[#1f2c3e] flex flex-col sm:flex-row gap-4 items-start">
+                      <div className={`w-20 h-28 rounded-xl bg-gradient-to-br ${currentSeries.coverGradient} shadow-xl shrink-0 flex flex-col justify-between p-2.5 text-white`}>
+                        <span className="text-[9px] font-mono opacity-80">红果</span>
                         <div>
-                          <div className="text-xs font-bold leading-tight">{currentSeries.chineseTitle.slice(0, 6)}</div>
-                          <div className="text-[10px] opacity-75">{currentSeries.totalEpisodes} Eps</div>
+                          <div className="text-[11px] font-bold leading-tight">{currentSeries.chineseTitle.slice(0, 6)}</div>
+                          <div className="text-[9px] opacity-75">{currentSeries.totalEpisodes} Eps</div>
                         </div>
                       </div>
 
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-bold text-white">
+                          <h4 className="text-base font-bold text-white">
                             {currentSeries.chineseTitle}
                             <span className="text-xs font-normal text-slate-400 ml-2">({currentSeries.title})</span>
                           </h4>
                           <button
                             onClick={() => setHasInspected(false)}
-                            className="text-xs text-slate-400 hover:text-white underline font-mono"
+                            className="text-xs text-slate-400 hover:text-white underline font-mono cursor-pointer"
                           >
                             Reset
                           </button>
@@ -620,7 +606,7 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                           {currentSeries.description}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-1">
+                        <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-400 pt-1">
                           <span>{t.rating}: <strong className="text-[#c6f135] font-mono">{currentSeries.rating}</strong></span>
                           <span>·</span>
                           <span>{t.studio}: <strong className="text-slate-200">{currentSeries.author}</strong></span>
@@ -631,145 +617,139 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
                     </div>
 
                     {/* Batch Actions & Grid */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => setSelectedEpisodes(currentSeries.episodes.map(e => e.episodeNumber))}
-                          className="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-[#161f2e] border border-[#273549] text-slate-200 hover:bg-[#1f2c3e]"
+                          className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#161f2e] border border-[#273549] text-slate-200 hover:bg-[#1f2c3e] cursor-pointer"
                         >
                           {t.selectAll} ({currentSeries.totalEpisodes})
                         </button>
                         <button
                           onClick={() => setSelectedEpisodes(currentSeries.episodes.filter(e => e.isFree).map(e => e.episodeNumber))}
-                          className="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-[#161f2e] border border-[#273549] text-slate-200 hover:bg-[#1f2c3e]"
+                          className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#161f2e] border border-[#273549] text-slate-200 hover:bg-[#1f2c3e] cursor-pointer"
                         >
                           {t.selectFree} (1–{currentSeries.freeEpisodes})
                         </button>
                         <button
                           onClick={() => setSelectedEpisodes([])}
-                          className="px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-transparent text-slate-400 hover:text-white"
+                          className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-transparent text-slate-400 hover:text-white cursor-pointer"
                         >
-                          {t.clearSelection}
+                          {lang === 'km' ? 'ដោះចេញទាំងអស់' : 'Deselect All'}
                         </button>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-mono text-slate-400">
-                          {t.selectedCount}: <strong className="text-[#c6f135]">{selectedEpisodes.length}</strong>
-                        </span>
-                        <button
-                          onClick={startDownloadBatch}
-                          disabled={selectedEpisodes.length === 0}
-                          className="px-5 py-2 text-xs font-bold rounded-xl bg-[#c6f135] hover:bg-[#b5e028] text-black shadow-md shadow-[#c6f135]/20 flex items-center gap-2 disabled:opacity-50"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>{t.downloadSelected} ({selectedEpisodes.length})</span>
-                        </button>
+                      <div className="text-xs font-mono text-slate-400">
+                        {t.selectedCount}: <span className="text-[#c6f135] font-bold">{selectedEpisodes.length}</span> / {currentSeries.totalEpisodes}
                       </div>
                     </div>
 
-                    {/* Episode Tiles Grid */}
-                    <div className="p-4 rounded-2xl bg-[#0e141f] border border-[#1b2536] max-h-64 overflow-y-auto">
-                      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                    {/* Episode Numbers Grid */}
+                    <div className="max-h-56 overflow-y-auto p-2.5 rounded-xl bg-[#0b0e14] border border-[#1b2536]">
+                      <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
                         {currentSeries.episodes.map(ep => {
                           const isSelected = selectedEpisodes.includes(ep.episodeNumber);
-                          const isDownloaded = history.some(h => h.seriesTitle === currentSeries.title && h.episodeNumber === ep.episodeNumber);
-
                           return (
                             <button
                               key={ep.episodeNumber}
                               onClick={() => toggleEpisode(ep.episodeNumber)}
-                              className={`p-2.5 rounded-xl text-center text-xs font-mono transition-all border relative ${
+                              className={`h-9 rounded-lg text-xs font-mono font-bold transition-all relative flex items-center justify-center cursor-pointer ${
                                 isSelected
-                                  ? 'bg-[#c6f135] text-black font-bold border-[#c6f135] shadow-sm'
-                                  : isDownloaded
-                                    ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-                                    : 'bg-[#141b26] border-[#222d3d] text-slate-300 hover:border-slate-600'
+                                  ? 'bg-[#c6f135] text-black shadow-sm font-black'
+                                  : ep.isFree
+                                    ? 'bg-[#141d2a] text-slate-200 border border-[#202d40] hover:border-slate-500'
+                                    : 'bg-[#0f1520] text-slate-400 border border-[#192230] hover:border-slate-600'
                               }`}
                             >
-                              <div className="font-bold">EP {ep.episodeNumber}</div>
-                              <div className="text-[10px] opacity-75 mt-0.5 truncate">
-                                {isDownloaded ? t.downloadedBadge : ep.isFree ? t.freeEpisodeBadge : t.vipEpisodeBadge}
-                              </div>
+                              <span>{ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}</span>
+                              {ep.isFree && !isSelected && (
+                                <span className="absolute top-1 right-1 w-1 h-1 rounded-full bg-emerald-400"></span>
+                              )}
                             </button>
                           );
                         })}
                       </div>
+                    </div>
+
+                    {/* Action Bar */}
+                    <div className="pt-2 flex items-center justify-end gap-3">
+                      <button
+                        onClick={handleStartDownload}
+                        disabled={selectedEpisodes.length === 0}
+                        className="w-full sm:w-auto px-6 py-2.5 text-xs font-bold rounded-xl bg-[#c6f135] hover:bg-[#b5e028] text-black flex items-center justify-center gap-2 shadow-lg shadow-[#c6f135]/25 active:scale-95 disabled:opacity-40 cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>{t.downloadSelected} ({selectedEpisodes.length})</span>
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* VIEW: TRANSFERS */}
+            {/* VIEW: TRANSFERS QUEUE */}
             {activeTab === 'transfers' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-white">{t.activeTasksTitle} ({tasks.length})</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {concurrency} workers · HTTP Range resume (.part)
-                    </p>
+                    <h3 className="text-lg font-bold text-white tracking-tight">{t.tabTransfers}</h3>
+                    <p className="text-xs text-slate-400">{lang === 'km' ? 'បញ្ជីទាញយកសកម្ម' : 'Active download tasks'}</p>
                   </div>
                   <button
-                    onClick={() => setTasks([])}
-                    className="px-3.5 py-1.5 text-xs text-slate-400 hover:text-white border border-[#273549] rounded-xl"
+                    onClick={() => {
+                      setTasks([]);
+                      triggerToast('Cleared transfer list');
+                    }}
+                    className="text-xs font-mono text-slate-400 hover:text-white underline cursor-pointer"
                   >
-                    {t.clearQueue}
+                    Clear All
                   </button>
                 </div>
 
-                {tasks.length === 0 ? (
-                  <div className="p-16 text-center border border-dashed border-[#1f2c3e] rounded-3xl text-slate-500 text-xs">
-                    <Download className="w-10 h-10 mx-auto mb-3 text-slate-600" />
-                    <span>{t.noActiveTasks}</span>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
-                    {tasks.map(task => (
-                      <div key={task.id} className="p-4 rounded-2xl bg-[#111722] border border-[#1f2c3e]">
-                        <div className="flex items-center justify-between text-xs mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-[#c6f135]">EP {String(task.episodeNumber).padStart(3, '0')}</span>
-                            <span className="font-medium text-slate-200 truncate max-w-xs">{task.targetFile}</span>
+                <div className="space-y-2.5">
+                  {tasks.length === 0 ? (
+                    <div className="p-12 text-center rounded-2xl bg-[#0b0e14] border border-[#1b2536]">
+                      <Download className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+                      <div className="text-xs text-slate-400 font-mono">No active downloads in queue</div>
+                    </div>
+                  ) : (
+                    tasks.map(task => (
+                      <div
+                        key={task.id}
+                        className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] space-y-2"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="font-bold text-white flex items-center gap-2">
+                            <span>{task.seriesTitle}</span>
+                            <span className="font-mono text-[#c6f135]">Ep {task.episodeNumber < 10 ? `0${task.episodeNumber}` : task.episodeNumber}</span>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono text-slate-400">{task.downloadSpeed}</span>
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              task.status === 'completed' 
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                : task.status === 'decrypting'
-                                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                  : 'bg-[#c6f135]/20 text-[#c6f135] border border-[#c6f135]/30'
-                            }`}>
-                              {task.status === 'completed' ? t.statusCompleted : task.status === 'decrypting' ? t.statusDecrypting : t.statusStreaming}
-                            </span>
-                            <button
-                              onClick={() => setTasks(tasks.filter(t => t.id !== task.id))}
-                              className="text-slate-500 hover:text-rose-400"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          </div>
+                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+                            task.status === 'completed'
+                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-[#c6f135]/20 text-[#c6f135] border border-[#c6f135]/30 animate-pulse'
+                          }`}>
+                            {task.status.toUpperCase()}
+                          </span>
                         </div>
 
                         {/* Progress Bar */}
-                        <div className="w-full bg-[#1b2536] h-2 rounded-full overflow-hidden mb-2">
-                          <div 
+                        <div className="w-full bg-[#182333] h-1.5 rounded-full overflow-hidden">
+                          <div
                             className={`h-full transition-all duration-300 ${
-                              task.status === 'completed' ? 'bg-emerald-400' : task.status === 'decrypting' ? 'bg-amber-400' : 'bg-[#c6f135]'
+                              task.status === 'completed' ? 'bg-emerald-400' : 'bg-[#c6f135]'
                             }`}
                             style={{ width: `${task.progress}%` }}
                           />
                         </div>
-                        <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                          <span>{task.partFile}</span>
-                          <span>{task.progress}% of ~{(task.totalBytes / (1024 * 1024)).toFixed(1)} MB</span>
+
+                        <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                          <span>{task.downloadedBytes} / {task.fileSize} ({task.progress}%)</span>
+                          <span>{task.speed}</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    ))
+                  )}
+                </div>
               </div>
             )}
 
@@ -777,80 +757,61 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
             {activeTab === 'history' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-white">{t.historyTitle} ({history.length})</h3>
+                  <div>
+                    <h3 className="text-lg font-bold text-white tracking-tight">{t.tabHistory}</h3>
+                    <p className="text-xs text-slate-400">{lang === 'km' ? 'ប្រវត្តិនៃការទាញយកកន្លងមក' : 'Completed downloads and exports'}</p>
+                  </div>
                   <button
-                    onClick={() => alert(`Windows Explorer: ${downloadFolder}`)}
-                    className="px-4 py-2 text-xs font-semibold rounded-xl bg-[#161f2e] border border-[#273549] text-slate-200 hover:bg-[#1f2c3e] flex items-center gap-2"
+                    onClick={() => triggerToast('Opened folder: C:\\Users\\User\\Videos\\Hongguo')}
+                    className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#161f2e] border border-[#273549] text-slate-200 hover:bg-[#1f2c3e] flex items-center gap-1.5 cursor-pointer"
                   >
                     <Folder className="w-3.5 h-3.5 text-[#c6f135]" />
-                    <span>{t.openFolder}</span>
+                    <span>Open Output Folder</span>
                   </button>
                 </div>
 
-                {history.length === 0 ? (
-                  <div className="p-16 text-center border border-dashed border-[#1f2c3e] rounded-3xl text-slate-500 text-xs">
-                    <Folder className="w-10 h-10 mx-auto mb-3 text-slate-600" />
-                    <span>{t.noHistory}</span>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
-                    {history.map(item => (
-                      <div key={item.id} className="p-4 rounded-2xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#182333] border border-[#273549] text-[#c6f135] flex items-center justify-center shrink-0">
-                            <Film className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="font-bold text-white text-sm">
-                              EP {String(item.episodeNumber).padStart(3, '0')} · {item.seriesTitle}
-                            </div>
-                            <div className="text-[11px] text-slate-500 font-mono truncate max-w-sm sm:max-w-md mt-0.5">
-                              {item.filePath}
-                            </div>
-                          </div>
+                <div className="space-y-2">
+                  {history.map(item => (
+                    <div
+                      key={item.id}
+                      className="p-3 rounded-xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between text-xs"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#162130] flex items-center justify-center text-[#c6f135]">
+                          <Film className="w-4 h-4" />
                         </div>
-
-                        <div className="flex items-center gap-4">
-                          <div className="text-right font-mono text-[11px] text-slate-400">
-                            <div>{item.fileSizeMb} MB</div>
-                            <div className="text-emerald-400">{item.resolution}</div>
+                        <div>
+                          <div className="font-bold text-white">{item.seriesTitle}</div>
+                          <div className="text-[11px] text-slate-400 font-mono">
+                            {item.episodeRange} · {item.fileCount} MP4 files · {item.totalSize}
                           </div>
-                          <button
-                            onClick={() => setPreviewingItem(item)}
-                            className="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-[#1c2738] hover:bg-[#25344a] text-slate-200 border border-[#2b3c54] flex items-center gap-1.5"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-[#c6f135]" />
-                            <span>{t.previewPlayback}</span>
-                          </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <span className="text-[11px] font-mono text-slate-500">{item.completedAt}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
             {/* VIEW: SYSTEM LOG */}
             {activeTab === 'log' && (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">{t.systemLogTitle}</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">{t.logInfo}</p>
-                  </div>
+                  <h3 className="text-lg font-bold text-white tracking-tight">{t.tabSystemLog}</h3>
                   <button
-                    onClick={() => setLogs([])}
-                    className="px-3.5 py-1.5 text-xs text-slate-400 hover:text-white border border-[#273549] rounded-xl"
+                    onClick={() => triggerToast('Logs exported to console.txt')}
+                    className="text-xs text-[#c6f135] hover:underline font-mono cursor-pointer"
                   >
-                    {t.clearLog}
+                    Export Log
                   </button>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#090c12] border border-[#1b2536] font-mono text-xs text-slate-300 max-h-[460px] overflow-y-auto space-y-1.5">
-                  {logs.map((log, idx) => (
-                    <div key={idx} className="leading-relaxed">
-                      <span className="text-[#c6f135]">{log.split(' ')[0]}</span>{' '}
-                      <span className="text-slate-400">{log.slice(log.indexOf(' ') + 1)}</span>
+                <div className="p-3 rounded-xl bg-[#090d14] border border-[#1a2538] font-mono text-xs text-slate-300 space-y-1.5 max-h-72 overflow-y-auto">
+                  {logs.map((log, i) => (
+                    <div key={i} className="leading-relaxed">
+                      <span className="text-[#c6f135]">{log.slice(0, 10)}</span>
+                      <span>{log.slice(10)}</span>
                     </div>
                   ))}
                 </div>
@@ -859,106 +820,53 @@ export const AppSimulator: React.FC<AppSimulatorProps> = ({
 
             {/* VIEW: PREFERENCES */}
             {activeTab === 'preferences' && (
-              <div className="space-y-5">
-                <div>
-                  <h3 className="text-xl font-bold text-white">{t.preferencesTitle}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">Custom paths and worker configuration.</p>
-                </div>
-
-                <div className="space-y-4 text-xs">
-                  <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] space-y-2">
-                    <label className="font-bold text-white block">{t.outputDirectory}</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={downloadFolder}
-                        onChange={e => setDownloadFolder(e.target.value)}
-                        className="flex-1 px-3.5 py-2.5 bg-[#0a0d14] border border-[#273549] rounded-xl font-mono text-slate-200 focus:outline-none"
-                      />
-                      <button
-                        onClick={() => alert('Folder picker dialog')}
-                        className="px-4 py-2.5 bg-[#161f2e] border border-[#273549] rounded-xl text-slate-200"
-                      >
-                        {t.browseFolder}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] space-y-2">
-                    <div className="flex justify-between items-center">
-                      <label className="font-bold text-white">{t.concurrencyLabel}</label>
-                      <span className="font-mono text-[#c6f135] font-bold">{concurrency} Parallel</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={1}
-                      max={4}
-                      value={concurrency}
-                      onChange={e => setConcurrency(Number(e.target.value))}
-                      className="w-full accent-[#c6f135]"
-                    />
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between">
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-white tracking-tight">{t.tabPreferences}</h3>
+                
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-white">{t.drmDecryptionLabel}</div>
-                      <div className="text-[11px] text-slate-400">{t.drmDecryptionDesc}</div>
+                      <div className="text-xs font-bold text-white">Default Download Path</div>
+                      <div className="text-[11px] font-mono text-slate-400">C:\Users\User\Videos\Hongguo</div>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={autoDecrypt}
-                      onChange={e => setAutoDecrypt(e.target.checked)}
-                      className="w-4 h-4 accent-[#c6f135] rounded"
-                    />
+                    <button
+                      onClick={() => triggerToast('Selected folder: C:\\Users\\User\\Videos\\Hongguo')}
+                      className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#161f2e] border border-[#273549] text-slate-200 cursor-pointer"
+                    >
+                      Browse
+                    </button>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-white">Max Parallel Streams</div>
+                      <div className="text-[11px] text-slate-400">2 workers (recommended for network stability)</div>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-[#c6f135] px-2 py-0.5 rounded bg-[#161f2e] border border-[#273549]">
+                      2
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-[#111722] border border-[#1f2c3e] flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-white">Auto AES Decryption</div>
+                      <div className="text-[11px] text-slate-400">Decodes raw encrypted chunks into normal MP4</div>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-emerald-400">ENABLED</span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Toast Notification */}
+            {toastMessage && (
+              <div className="fixed bottom-6 right-6 z-50 px-4 py-2 rounded-xl bg-[#c6f135] text-black font-bold text-xs shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+                {toastMessage}
               </div>
             )}
           </div>
         </div>
       </div>
-
-      {/* Video Preview Modal simulation */}
-      {previewingItem && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-[#1f2c3e] rounded-3xl max-w-lg w-full p-6 text-white shadow-2xl relative">
-            <button
-              onClick={() => setPreviewingItem(null)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-white"
-            >
-              ✕
-            </button>
-            <div className="text-xs text-[#c6f135] font-mono mb-2 font-bold">
-              {previewingItem.resolution} · DECRYPTED H.264 MP4
-            </div>
-            <h3 className="text-lg font-bold mb-1">
-              EP {previewingItem.episodeNumber} - {previewingItem.seriesTitle}
-            </h3>
-            <p className="text-xs text-slate-400 mb-4 font-mono truncate">
-              {previewingItem.filePath}
-            </p>
-
-            <div className="w-full aspect-video rounded-2xl bg-black border border-[#1e293b] flex items-center justify-center relative overflow-hidden group">
-              <div className="w-14 h-14 rounded-full bg-[#c6f135] flex items-center justify-center text-black shadow-xl cursor-pointer hover:scale-105 transition-transform">
-                <Play className="w-6 h-6 ml-0.5 fill-black" />
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 flex justify-between text-xs font-mono text-slate-400">
-                <span>00:15 / {previewingItem.duration}</span>
-                <span className="text-emerald-400">Clean Bitstream</span>
-              </div>
-            </div>
-
-            <div className="mt-5 flex justify-end">
-              <button
-                onClick={() => setPreviewingItem(null)}
-                className="px-5 py-2 text-xs font-bold bg-[#1a2332] hover:bg-[#253246] text-white rounded-xl"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 };

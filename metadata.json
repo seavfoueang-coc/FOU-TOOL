@@ -2,5 +2,7 @@
   "name": "HONGGUO DL — Windows Downloader for Hongguo Short Dramas",
   "description": "Technical showcase and architectural breakdown of HONGGUO DL, a high-performance Windows desktop application for parsing, downloading, and decrypting short dramas from ByteDance's Hongguo platform.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

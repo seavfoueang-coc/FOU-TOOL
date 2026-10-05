@@ -1,0 +1,44 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hgLime" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d8ff43" />
+      <stop offset="1" stop-color="#b4e41f" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.9" />
+    </filter>
+  </defs>
+
+  <!-- Left Film Sprocket -->
+  <g fill="#ffffff">
+    <path d="M 28 65 C 28 62 31 60 34 60 L 40 60 L 40 140 L 34 140 C 31 140 28 138 28 135 Z" fill="#1b2433" />
+    <rect x="30" y="68" width="7" height="15" rx="2" fill="#ffffff" />
+    <rect x="30" y="92" width="7" height="15" rx="2" fill="#ffffff" />
+    <rect x="30" y="116" width="7" height="15" rx="2" fill="#ffffff" />
+  </g>
+
+  <!-- Right Film Sprocket -->
+  <g fill="#ffffff">
+    <path d="M 172 65 C 172 62 169 60 166 60 L 160 60 L 160 140 L 166 140 C 169 140 172 138 172 135 Z" fill="#1b2433" />
+    <rect x="163" y="68" width="7" height="15" rx="2" fill="#ffffff" />
+    <rect x="163" y="92" width="7" height="15" rx="2" fill="#ffffff" />
+    <rect x="163" y="116" width="7" height="15" rx="2" fill="#ffffff" />
+  </g>
+
+  <!-- Hexagon Backplate -->
+  <path d="M 100 18 L 158 52 L 158 148 L 100 182 L 42 148 L 42 52 Z" fill="#0b0f17" stroke="#1f2c3d" stroke-width="3" />
+
+  <!-- Letter H -->
+  <path d="M 46 56 L 94 30 L 94 92 L 62 92 L 62 110 L 94 110 L 94 170 L 46 144 Z" fill="url(#hgLime)" stroke="#090d14" stroke-width="4" stroke-linejoin="round" />
+  <path d="M 62 70 L 78 61 L 78 82 L 62 82 Z" fill="#0b0f17" />
+  <path d="M 62 120 L 78 120 L 78 139 L 62 130 Z" fill="#0b0f17" />
+
+  <!-- Letter G -->
+  <path d="M 106 30 L 154 56 L 154 144 L 106 170 L 106 130 L 138 114 L 138 100 L 120 100 L 120 86 L 154 70 L 154 56 Z" fill="url(#hgLime)" stroke="#090d14" stroke-width="4" stroke-linejoin="round" />
+  <path d="M 106 130 L 106 170 L 154 144 L 154 100 L 126 100 L 126 114 L 138 114 L 138 134 L 106 150 Z" fill="url(#hgLime)" stroke="#090d14" stroke-width="3" />
+
+  <!-- Downward Download Arrow inside G -->
+  <g filter="url(#shadow)">
+    <path d="M 124 72 L 134 72 L 134 86 L 142 86 L 129 100 L 116 86 L 124 86 Z" fill="#ffffff" stroke="#090d14" stroke-width="1.5" stroke-linejoin="round" />
+  </g>
+</svg>

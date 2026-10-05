@@ -14,7 +14,7 @@ export const HowItWorksSimple: React.FC<HowItWorksSimpleProps> = ({ darkMode, la
     <section id="how-it-works" className={`py-16 border-t ${
       darkMode ? 'bg-[#080b11] border-[#18202d]' : 'bg-slate-50 border-slate-200'
     }`}>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-5xl mx-auto lg:px-8 box-border">
         <div className="text-center max-w-xl mx-auto mb-12">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
             {t.howItWorksTitle}

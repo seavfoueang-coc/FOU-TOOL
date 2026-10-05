@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Download, Check, Copy } from 'lucide-react';
 import { Language, TRANSLATIONS } from '../i18n/translations';
-
 import { APP_DOWNLOAD_URL, APP_EXE_FILENAME, APP_VERSION } from '../config/constants';
+import { HongguoLogo } from './HongguoLogo';
 
 interface DownloadModalProps {
   isOpen: boolean;
@@ -55,16 +55,19 @@ export const DownloadModal: React.FC<DownloadModalProps> = ({
           ✕
         </button>
 
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-xs font-mono text-[#c6f135] uppercase font-bold mb-1">
-            <span>{t.modalKicker}</span>
+        <div className="flex items-center gap-3.5 mb-6">
+          <HongguoLogo size={50} className="shrink-0" />
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono text-[#c6f135] uppercase font-bold mb-0.5">
+              <span>{t.modalKicker}</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+              {t.modalTitle}
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {t.modalDesc}
+            </p>
           </div>
-          <h3 className="text-2xl font-extrabold tracking-tight">
-            {t.modalTitle}
-          </h3>
-          <p className="text-xs text-slate-400 mt-1">
-            {t.modalDesc}
-          </p>
         </div>
 
         {/* Download Artifact Cards */}
