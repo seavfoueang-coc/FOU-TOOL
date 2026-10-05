@@ -119,8 +119,12 @@ This repository is pre-configured with `vercel.json` for one-click deployment on
 - **GitHub**: [@seavfoueang-coc](https://github.com/seavfoueang-coc)
 - **Telegram**: [@eangseavfou](https://t.me/eangseavfou)
 - **Role**: Software Developer & Creator of HONGGUO DL
+- **Methodology**: ⚡ Vibe Coded with passion & precision
 
-> *"Hi! I am Seavfou Eang, a software developer passionate about building clean, efficient, and reliable desktop tools. I built HONGGUO DL to give people a straightforward, 100% free way to preserve and watch their favorite Hongguo short dramas offline on Windows—without bloatware, telemetry, or annoying ads."*
+> *"Hi! I am Seavfou Eang. I vibe coded HONGGUO DL to give everyone a straightforward, 100% free way to preserve and watch their favorite Hongguo short dramas offline on Windows—without bloatware, telemetry, or annoying ads."*
+
+### 🔒 Bypass Engine & Source Code Notice
+> **Important Note**: The stream decryption and internal bypass engine source code is proprietary and **not publicly disclosed**. It is kept private to protect long-term stability and prevent upstream CDN API patch invalidation. The full working Windows application is distributed as a pre-compiled, standalone binary installer (`.exe`).
 
 ---
 

@@ -48,6 +48,9 @@ export const TRANSLATIONS = {
     aboutHandle: '@seavfoueang-coc',
     aboutRole: 'Software Developer · Creator of HONGGUO DL',
     aboutBio: 'Hi! I am Seavfou Eang, a software developer passionate about building clean, efficient, and reliable desktop tools. I built HONGGUO DL to give people a straightforward, 100% free way to preserve and watch their favorite Hongguo short dramas offline on Windows—without bloatware, telemetry, or annoying ads.',
+    vibeCodedBadge: 'Vibe Coded by Seavfou',
+    bypassNoticeTitle: 'Bypass Engine & Source Notice',
+    bypassNoticeDesc: 'I vibe coded this entire project. Please note: The internal stream bypass and DRM decryption source code is kept strictly private and will not be made public to avoid API patch invalidation and protect long-term stability. The desktop app is released as a clean, ready-to-run Windows .exe installer.',
     githubBtn: 'GitHub Profile',
     telegramBtn: 'Telegram: @eangseavfou',
 
@@ -192,6 +195,9 @@ export const TRANSLATIONS = {
     aboutHandle: '@seavfoueang-coc',
     aboutRole: 'Software Developer · អ្នកបង្កើត HONGGUO DL',
     aboutBio: 'សួស្តី! ខ្ញុំបាទឈ្មោះ Seavfou Eang ជាអ្នកអភិវឌ្ឍន៍កម្មវិធីកុំព្យូទ័រ។ ខ្ញុំបានបង្កើតកម្មវិធី HONGGUO DL នេះឡើងក្នុងគោលបំណងផ្តល់ភាពងាយស្រួល និងឥតគិតថ្លៃ ១០០% ដល់អ្នកទាំងអស់គ្នាដែលចូលចិត្តទស្សនារឿងភាគខ្លី Hongguo ឱ្យអាចទាញយករក្សាទុកក្នុងកុំព្យូទ័រ Windows បានយ៉ាងរហ័ស គ្មានការរំខានពីផ្ទាំងពាណិជ្ជកម្ម និងគ្មានការគិតប្រាក់អ្វីទាំងអស់។',
+    vibeCodedBadge: 'Vibe Coded ដោយ Seavfou',
+    bypassNoticeTitle: 'សេចក្តីជូនដំណឹងអំពី Source Code Bypass',
+    bypassNoticeDesc: 'ខ្ញុំបាន vibe code គម្រោងនេះឡើងដោយផ្ទាល់។ ចំណាំ៖ Source code នៃផ្នែក bypass និង decryption មិនត្រូវបានដាក់ជាសាធារណៈឡើយ (រក្សាទុកជាឯកជនដើម្បីការពារកុំឱ្យបែកធ្លាយ និងខូចប្រព័ន្ធ)។ កម្មវិធីសម្រាប់ Windows ត្រូវបានផ្ដល់ជូនជាឯកសារដំឡើង (.exe) ស្រាប់។',
     githubBtn: 'គណនី GitHub',
     telegramBtn: 'Telegram: @eangseavfou',
 
